@@ -11,7 +11,7 @@
 
 color ray_color(const ray& r, const hittable& world) {
 	hit_record rec;
-	if (world.hit(r,0, infinity, rec)) {
+	if (world.hit(r,0, inf, rec)) {
 		return 0.5 * (rec.normal + white);
 	}
 	vec3 unit_direction = unit_vector(r.direction());
@@ -30,7 +30,7 @@ int main() {
 	// World
 	hittable_list world;
 	world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
-	world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
+	world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));
 
 	// Camera
 

@@ -1,3 +1,5 @@
+#ifndef HITTABLE_H
+#define HITTABLE_H
 #include "vec3.h"
 #include "ray.h"
 
@@ -18,3 +20,4 @@ class hittable {
     public:
         virtual bool hit(const ray& r, double tmin, double tmax, hit_record& h) const = 0;
 };
+#endif
