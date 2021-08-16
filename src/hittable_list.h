@@ -29,7 +29,7 @@ bool hittable_list::hit(const ray& r, double tmin, double tmax, hit_record& h) c
 
     for (const auto& object : objects) {
         // the hit method from the pointer to the object
-        if (object->hit(r, tmin, tclosest, h)) {
+        if (object->hit(r, tmin, tclosest, temp_rec)) {
             hit_something = true;
             h = temp_rec;
             tclosest = temp_rec.t;

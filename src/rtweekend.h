@@ -4,10 +4,12 @@
 #include <cmath>
 #include <memory>
 #include <limits>
+#include <cstdlib>
 
 using std::shared_ptr;
 using std::make_shared;
 using std::sqrt;
+using std::rand;
 
 // Math constants
 const double inf = std::numeric_limits<double>::infinity();

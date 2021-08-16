@@ -10,9 +10,9 @@ struct hit_record {
     bool front_face;
 
     inline void set_face_normal(const ray& r, const vec3& outward_normal) {
+        // setting the normal to always be going against the ray.
         front_face = dot(r.direction(), outward_normal) < 0;
         normal = front_face ? outward_normal : -outward_normal;
-        // setting the normal to  be always be going against the ray.
     }
 };
 
@@ -20,4 +20,5 @@ class hittable {
     public:
         virtual bool hit(const ray& r, double tmin, double tmax, hit_record& h) const = 0;
 };
+
 #endif

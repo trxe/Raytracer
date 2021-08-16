@@ -12,6 +12,7 @@
 color ray_color(const ray& r, const hittable& world) {
 	hit_record rec;
 	if (world.hit(r,0, inf, rec)) {
+		vec3 normal = rec.normal;
 		return 0.5 * (rec.normal + white);
 	}
 	vec3 unit_direction = unit_vector(r.direction());
