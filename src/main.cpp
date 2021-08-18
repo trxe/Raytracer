@@ -13,9 +13,9 @@
 color ray_color(const ray& r, const hittable& world, int depth) {
 	hit_record rec;
 	if (depth <= 0) return black;
-	if (world.hit(r,0, inf, rec)) {
-		// point3 target = rec.p + rec.normal + random_in_unit_sphere(); 
-		return 0.5 * ray_color(ray(rec.p, - rec.p), world, depth-1);
+	if (world.hit(r, 0.001, inf, rec)) {
+		point3 target = rec.p + rec.normal + random_unit_vector();
+		return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth-1);
 	}
 	vec3 unit_direction = unit_vector(r.direction());
 	auto t = 0.5 * (unit_direction.y() + 1.0);
@@ -36,7 +36,7 @@ int main() {
 	auto image_width = 400;
 	auto image_height = static_cast<int>(400 / aspect_ratio);
 	const int samples_per_pixel = 100;
-	const int max_depth = 20;
+	const int max_depth = 50;
 
 	// Camera
 

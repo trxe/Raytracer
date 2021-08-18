@@ -107,11 +107,24 @@ inline vec3 unit_vector(vec3 v) {
     return v / v.length();
 }
 
+// lazy hack
 vec3 random_in_unit_sphere() {
     while (true) {
         auto p = vec3::random(-1.0, 1.0);
         if (p.length_squared() < 1.0) return p;
     }
+}
+
+// true Lambertian reflection
+vec3 random_unit_vector() {
+    return unit_vector(random_in_unit_sphere());
+}
+
+// alt formulation
+vec3 random_in_hemisphere(const vec3& normal) {
+    vec3 r = random_in_unit_sphere();
+    if (dot(r, normal) < 0.0) return -r;
+    return r;
 }
 
 #endif
