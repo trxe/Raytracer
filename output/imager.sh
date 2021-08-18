@@ -1,1 +1,1 @@
-./main.exe > ../img/image_2balls.ppm
+./main.exe > ../img/image_2ballsMatte.ppm
