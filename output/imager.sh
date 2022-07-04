@@ -1,1 +1,1 @@
-./main.exe > ../img/image_2ballsMatteGammaTrueLambertian.ppm
+./main.exe > ../img/image_3ballsMatteMetal1080.ppm

@@ -1,3 +1,8 @@
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image/stb_image_write.h"
+
 #include <iostream>
 #include <memory>
 #include <limits>
@@ -6,16 +11,20 @@
 #include "camera.h"
 #include "ray.h"
 #include "sphere.h"
+#include "material.h"
 #include "rtweekend.h"
 #include "hittable.h"
 #include "hittable_list.h"
 
-color ray_color(const ray& r, const hittable& world, int depth) {
-	hit_record rec;
+Color ray_color(const Ray& r, const Hittable& world, int depth) {
+	HitRecord rec;
 	if (depth <= 0) return black;
 	if (world.hit(r, 0.001, inf, rec)) {
-		point3 target = rec.p + rec.normal + random_unit_vector();
-		return 0.5 * ray_color(ray(rec.p, target - rec.p), world, depth-1);
+		Color attenuation;
+		Ray scattered;
+		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+			return attenuation * ray_color(scattered, world, depth-1);
+		return black;
 	}
 	vec3 unit_direction = unit_vector(r.direction());
 	auto t = 0.5 * (unit_direction.y() + 1.0);
@@ -26,17 +35,25 @@ int main() {
 	
 	// World
 
+	shared_ptr<Material> mat_ground = make_shared<Lambertian>(0.6 * yellow);
+	shared_ptr<Material> mat_center = make_shared<Lambertian>(0.6 * red);
+	shared_ptr<Material> mat_left = make_shared<Metal>(0.8 * white);
+	shared_ptr<Material> mat_right = make_shared<Metal>(Color(0.8, 0.6, 0.2));
+
 	hittable_list world;
-	world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
-	world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));
+	world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5, mat_center));
+	world.add(make_shared<Sphere>(Point3(-1.0, 0, -1), 0.5, mat_left));
+	world.add(make_shared<Sphere>(Point3(1.0, 0, -1), 0.5, mat_right));
+	world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100, mat_ground));
 
 	//Image
 
 	auto aspect_ratio = 16.0 / 9.0;
-	auto image_width = 400;
-	auto image_height = static_cast<int>(400 / aspect_ratio);
+	auto image_width = 1920;
+	auto image_height = static_cast<int>(image_width / aspect_ratio);
 	const int samples_per_pixel = 100;
 	const int max_depth = 50;
+	const int channels = 4;
 
 	// Camera
 
@@ -44,16 +61,19 @@ int main() {
 
 	// Render
 
+	// unsigned char *img = stbi_load("")
+
+
 	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 	for (int row = image_height - 1; row >= 0; row--) {
 		std::cerr << "\rLines remaining: " << row << ' ' << std::flush;
 		for (int col = 0; col < image_width; col++) {
-			color pixel_color(0.0, 0.0, 0.0);
+			Color pixel_color(0.0, 0.0, 0.0);
 			for (int s = 0; s < samples_per_pixel; s++) {
 				auto u = (double(col) + random_double()) / (image_width - 1);
 				auto v = (double(row) + random_double()) / (image_height - 1);
-				ray r = cam.get_ray(u, v);
+				Ray r = cam.get_ray(u, v);
 				pixel_color += ray_color(r, world, max_depth);
 			}
 			write_color(std::cout, pixel_color, samples_per_pixel);

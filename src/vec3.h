@@ -6,6 +6,7 @@
 #include "rtweekend.h"
 
 using std::sqrt;
+using std::fabs;
 
 struct vec3 {
     vec3() : e{0,0,0} {};
@@ -54,13 +55,18 @@ struct vec3 {
             return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
         }
 
+        inline bool near_zero() {
+            const auto s = 1e-8;
+            return fabs(e[0]) < s && fabs(e[1]) < s && fabs(e[2]) < s;
+        }
+
     public:
         double e[3];
 };
 
 // Type aliases for vec3
-using point3 = vec3;   // 3D point
-using color = vec3;    // RGB color
+using Point3 = vec3;   // 3D point
+using Color = vec3;    // RGB color
 
 
 inline std::ostream& operator<<(std::ostream &out, const vec3 &v) {
@@ -101,6 +107,10 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
     return vec3(u.e[1] * v.e[2] - u.e[2] * v.e[1],
                 u.e[2] * v.e[0] - u.e[0] * v.e[2],
                 u.e[0] * v.e[1] - u.e[1] * v.e[0]);
+}
+
+inline vec3 reflect(const vec3 &v, const vec3 &normal) {
+    return v - 2 * normal * dot(v, normal);
 }
 
 inline vec3 unit_vector(vec3 v) {

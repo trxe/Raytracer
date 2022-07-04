@@ -8,22 +8,22 @@ using std::shared_ptr;
 using std::make_shared;
 using std::vector;
 
-class hittable_list : public hittable {
+class hittable_list : public Hittable {
     public:
         hittable_list() {}
-        hittable_list(shared_ptr<hittable> object) {
+        hittable_list(shared_ptr<Hittable> object) {
         }
 
-        void add(shared_ptr<hittable> object) { objects.push_back(object); }
+        void add(shared_ptr<Hittable> object) { objects.push_back(object); }
         void clear() { objects.clear(); }
-        virtual bool hit(const ray& r, double tmin, double tmax, hit_record& h) const override;
+        virtual bool hit(const Ray& r, double tmin, double tmax, HitRecord& h) const override;
 
     public:
-        vector<shared_ptr<hittable>> objects;
+        vector<shared_ptr<Hittable>> objects;
 };
 
-bool hittable_list::hit(const ray& r, double tmin, double tmax, hit_record& h) const {
-    hit_record temp_rec;
+bool hittable_list::hit(const Ray& r, double tmin, double tmax, HitRecord& h) const {
+    HitRecord temp_rec;
     bool hit_something = false;
     double tclosest = tmax;
 

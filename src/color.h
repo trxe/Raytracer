@@ -6,14 +6,15 @@
 
 #include <iostream>
 
-color red = color(0.8, 0.1, 0.5);
-color blue = color(0.5, 0.7, 1.0);
-color white = color(1.0, 1.0, 1.0);
-color black = color(0.0, 0.0, 0.0);
+Color red = Color(0.8, 0.1, 0.5);
+Color blue = Color(0.5, 0.7, 1.0);
+Color yellow = Color(1.0, 1.0, 0.0);
+Color white = Color(1.0, 1.0, 1.0);
+Color black = Color(0.0, 0.0, 0.0);
 double min = 0.0;
 double max = 0.999;
 
-void write_color(std::ostream &out, color pixel_color, int samples_per_pixel) {
+void write_color(std::ostream &out, Color pixel_color, int samples_per_pixel) {
     auto r = pixel_color.x();
     auto g = pixel_color.y();
     auto b = pixel_color.z();

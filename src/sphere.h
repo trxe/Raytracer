@@ -4,12 +4,12 @@
 #include "ray.h"
 #include "hittable.h"
 
-class sphere : public hittable {
+class Sphere : public Hittable {
     public: 
-        sphere() {}
-        sphere(point3 cen, double r) : center(cen), radius(r) {};
+        Sphere() {}
+        Sphere(Point3 cen, double r, shared_ptr<Material> m) : center(cen), radius(r), mat_ptr(m) {};
 
-        virtual bool hit(const ray& r, double tmin, double tmax, hit_record& h) const override {
+        virtual bool hit(const Ray& r, double tmin, double tmax, HitRecord& h) const override {
             vec3 oc = r.origin() - center;
             double a = dot(r.direction(), r.direction());
             double half_b = dot(r.direction(), oc);
@@ -29,12 +29,14 @@ class sphere : public hittable {
             h.p = r.at(h.t);
             vec3 outward_normal = (h.p - center) / radius;
             h.set_face_normal(r, outward_normal);
+            h.mat_ptr = mat_ptr;
             return true;
         }
 
     public:
-        point3 center;
+        Point3 center;
         double radius;
+        shared_ptr<Material> mat_ptr;
 };
 
 #endif
