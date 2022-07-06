@@ -14,7 +14,7 @@ Color black = Color(0.0, 0.0, 0.0);
 double min = 0.0;
 double max = 0.999;
 
-void write_color(std::ostream &out, Color pixel_color, int samples_per_pixel) {
+inline int* getIntColor(Color pixel_color, int samples_per_pixel) {
     auto r = pixel_color.x();
     auto g = pixel_color.y();
     auto b = pixel_color.z();
@@ -25,9 +25,12 @@ void write_color(std::ostream &out, Color pixel_color, int samples_per_pixel) {
     g = sqrt(g * scale);
     b = sqrt(b * scale);
 
-    out << static_cast<int>(clamp(r, min, max) * 256) << ' '
-        << static_cast<int>(clamp(g, min, max) * 256) << ' '
-        << static_cast<int>(clamp(b, min, max) * 256) << '\n';
+    return new int[]{
+        static_cast<int>(clamp(r, min, max) * 256),
+        static_cast<int>(clamp(g, min, max) * 256),
+        static_cast<int>(clamp(b, min, max) * 256),
+    };
+
 }
 
 #endif

@@ -48,12 +48,12 @@ int main() {
 
 	//Image
 
-	auto aspect_ratio = 16.0 / 9.0;
-	auto image_width = 1920;
-	auto image_height = static_cast<int>(image_width / aspect_ratio);
+	double aspect_ratio = 16.0 / 9.0;
+	int image_width = 640;
+	int image_height = static_cast<int>(image_width / aspect_ratio);
+	int channels = 4;
 	const int samples_per_pixel = 100;
 	const int max_depth = 50;
-	const int channels = 4;
 
 	// Camera
 
@@ -61,24 +61,40 @@ int main() {
 
 	// Render
 
-	// unsigned char *img = stbi_load("")
+	unsigned char *data = new unsigned char[channels * image_width * image_height];
+	/*
+	for (int c = 0; c < channels; c++) {
+		for (int j = 0; j < image_height; j++) {
+			for (int i = 0; i < image_width; i++) {
+				int src_index = c + channels * i + channels * image_width * j;
+			}
+		}
+	}
+	*/
 
-
-	std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+	// std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 	for (int row = image_height - 1; row >= 0; row--) {
 		std::cerr << "\rLines remaining: " << row << ' ' << std::flush;
 		for (int col = 0; col < image_width; col++) {
 			Color pixel_color(0.0, 0.0, 0.0);
 			for (int s = 0; s < samples_per_pixel; s++) {
-				auto u = (double(col) + random_double()) / (image_width - 1);
-				auto v = (double(row) + random_double()) / (image_height - 1);
+				double u = (double(col) + random_double()) / (image_width - 1);
+				double v = (double(row) + random_double()) / (image_height - 1);
 				Ray r = cam.get_ray(u, v);
 				pixel_color += ray_color(r, world, max_depth);
 			}
-			write_color(std::cout, pixel_color, samples_per_pixel);
+			int *cols = getIntColor(pixel_color, samples_per_pixel);
+			for (int c = 0; c < channels; c++) {
+				int src_index = c + channels * col + channels * image_width * (image_height - row);
+				int val = c == 3 ? 255 : cols[c];
+				data[src_index] = (unsigned char)val;
+			}
+			// write_color(std::cout, pixel_color, samples_per_pixel);
 		}
 	}
 
-	std::cerr << "\nDone." << std::endl;
+	stbi_write_png("img/output.png", image_width, image_height, channels, data, image_width * channels);
+
+	// std::cerr << "\nDone." << std::endl;
 }
