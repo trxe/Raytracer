@@ -18,29 +18,32 @@
 
 Color ray_color(const Ray& r, const Hittable& world, int depth) {
 	HitRecord rec;
-	if (depth <= 0) return black;
+	if (depth <= 0) return BLACK;
 	if (world.hit(r, 0.001, inf, rec)) {
 		Color attenuation;
 		Ray scattered;
 		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
 			return attenuation * ray_color(scattered, world, depth-1);
-		return black;
+		return BLACK;
 	}
 	vec3 unit_direction = unit_vector(r.direction());
 	auto t = 0.5 * (unit_direction.y() + 1.0);
-	return (1.0-t)*white + t*blue;
+	return (1.0-t)*WHITE + t*BLUE;
 }
 
-int main() {
+/**
+ * argv[1]: Filename of output. Defaults to img/output.png if not present.
+ */
+int main(int argc, char **argv) {
 	
 	// World
 
-	shared_ptr<Material> mat_ground = make_shared<Lambertian>(0.6 * yellow);
-	shared_ptr<Material> mat_center = make_shared<Lambertian>(0.6 * red);
-	shared_ptr<Material> mat_left = make_shared<Metal>(0.8 * white);
+	shared_ptr<Material> mat_ground = make_shared<Lambertian>(0.6 * YELLOW);
+	shared_ptr<Material> mat_center = make_shared<Lambertian>(0.6 * RED);
+	shared_ptr<Material> mat_left = make_shared<Metal>(0.8 * WHITE);
 	shared_ptr<Material> mat_right = make_shared<Metal>(Color(0.8, 0.6, 0.2));
 
-	hittable_list world;
+	HittableList world;
 	world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5, mat_center));
 	world.add(make_shared<Sphere>(Point3(-1.0, 0, -1), 0.5, mat_left));
 	world.add(make_shared<Sphere>(Point3(1.0, 0, -1), 0.5, mat_right));
@@ -62,17 +65,6 @@ int main() {
 	// Render
 
 	unsigned char *data = new unsigned char[channels * image_width * image_height];
-	/*
-	for (int c = 0; c < channels; c++) {
-		for (int j = 0; j < image_height; j++) {
-			for (int i = 0; i < image_width; i++) {
-				int src_index = c + channels * i + channels * image_width * j;
-			}
-		}
-	}
-	*/
-
-	// std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 	for (int row = image_height - 1; row >= 0; row--) {
 		std::cerr << "\rLines remaining: " << row << ' ' << std::flush;
@@ -90,11 +82,9 @@ int main() {
 				int val = c == 3 ? 255 : cols[c];
 				data[src_index] = (unsigned char)val;
 			}
-			// write_color(std::cout, pixel_color, samples_per_pixel);
 		}
 	}
 
-	stbi_write_png("img/output.png", image_width, image_height, channels, data, image_width * channels);
-
-	// std::cerr << "\nDone." << std::endl;
+	const char *filename = argc > 1 ? argv[1] : "img/output.png";
+	stbi_write_png(filename, image_width, image_height, channels, data, image_width * channels);
 }

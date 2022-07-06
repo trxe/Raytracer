@@ -6,13 +6,13 @@
 
 #include <iostream>
 
-Color red = Color(0.8, 0.1, 0.5);
-Color blue = Color(0.5, 0.7, 1.0);
-Color yellow = Color(1.0, 1.0, 0.0);
-Color white = Color(1.0, 1.0, 1.0);
-Color black = Color(0.0, 0.0, 0.0);
-double min = 0.0;
-double max = 0.999;
+static Color RED = Color(0.8, 0.1, 0.5);
+static Color BLUE = Color(0.5, 0.7, 1.0);
+static Color YELLOW = Color(1.0, 1.0, 0.0);
+static Color WHITE = Color(1.0, 1.0, 1.0);
+static Color BLACK = Color(0.0, 0.0, 0.0);
+const double min = 0.0;
+const double max = 0.999;
 
 inline int* getIntColor(Color pixel_color, int samples_per_pixel) {
     auto r = pixel_color.x();

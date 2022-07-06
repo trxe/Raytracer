@@ -66,6 +66,7 @@ OUTPUTMAIN	:= $(call FIXPATH,$(OUTPUT)/$(MAIN))
 
 all: $(OUTPUT) $(MAIN)
 	@echo Executing 'all' complete!
+	$(RM) $(call FIXPATH,$(OBJECTS))
 
 $(OUTPUT):
 	$(MD) $(OUTPUT)

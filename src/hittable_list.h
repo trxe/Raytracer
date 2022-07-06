@@ -1,3 +1,5 @@
+#ifndef HITTABLE_LIST_H
+#define HITTABLE_LIST_H
 #include <memory>
 #include <vector>
 
@@ -5,13 +7,12 @@
 #include "hittable.h"
 
 using std::shared_ptr;
-using std::make_shared;
 using std::vector;
 
-class hittable_list : public Hittable {
+class HittableList : public Hittable {
     public:
-        hittable_list() {}
-        hittable_list(shared_ptr<Hittable> object) {
+        HittableList() {}
+        HittableList(shared_ptr<Hittable> object) {
         }
 
         void add(shared_ptr<Hittable> object) { objects.push_back(object); }
@@ -22,19 +23,4 @@ class hittable_list : public Hittable {
         vector<shared_ptr<Hittable>> objects;
 };
 
-bool hittable_list::hit(const Ray& r, double tmin, double tmax, HitRecord& h) const {
-    HitRecord temp_rec;
-    bool hit_something = false;
-    double tclosest = tmax;
-
-    for (const auto& object : objects) {
-        // the hit method from the pointer to the object
-        if (object->hit(r, tmin, tclosest, temp_rec)) {
-            hit_something = true;
-            h = temp_rec;
-            tclosest = temp_rec.t;
-        }
-    }
-
-    return hit_something;
-}
+#endif
