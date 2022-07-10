@@ -14,6 +14,13 @@ static Color BLACK = Color(0.0, 0.0, 0.0);
 const double min = 0.0;
 const double max = 0.999;
 
+/**
+ * @brief Get an int array (RGB 0 - 255) from Color.
+ * 
+ * @param pixel_color 
+ * @param samples_per_pixel 
+ * @return int* 
+ */
 inline int* getIntColor(Color pixel_color, int samples_per_pixel) {
     auto r = pixel_color.x();
     auto g = pixel_color.y();

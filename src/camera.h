@@ -5,9 +5,13 @@
 #include "ray.h"
 #include "rtweekend.h"
 
-class camera {
+class Camera {
 public: 
-    camera() {
+    /**
+     * @brief Construct a new camera object. with default origin, aspect_ratio, viewport coords and focal-length.
+     * 
+     */
+    Camera() {
         auto aspect_ratio = 16.0 / 9.0;
         auto viewport_height = 2.0;
         auto viewport_width = viewport_height * aspect_ratio;
@@ -19,6 +23,13 @@ public:
         lower_left_corner = origin - 0.5 * vertical - 0.5 * horizontal - vec3(0.0, 0.0, focal_length);
     }
 
+    /**
+     * @brief Get the ray from origin passing through a pixel at image coordinates u, v.
+     * 
+     * @param u x-coordinate, ranges from 0 to 1 (left-most to right-most).
+     * @param v y-coordinate, ranges from 0 to 1 (bottom-most to top-most).
+     * @return Ray from origin through pixel
+     */
     Ray get_ray(double u, double v) const {
         return Ray(origin, lower_left_corner + u*horizontal + v*vertical - origin);
     }

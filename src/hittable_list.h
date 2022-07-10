@@ -9,6 +9,10 @@
 using std::shared_ptr;
 using std::vector;
 
+/**
+ * @brief List of hittables to go through to find the front-most.
+ * 
+ */
 class HittableList : public Hittable {
 public:
     HittableList() {}

@@ -12,13 +12,13 @@ using std::sqrt;
 using std::rand;
 
 // Math constants
-const double inf = std::numeric_limits<double>::infinity();
-const double pi = 3.1415926535897932385;
+const double INFTY = std::numeric_limits<double>::infinity();
+const double PI = 3.1415926535897932385;
 
 // Utility function 
 
 inline double degrees_to_radians(int deg) {
-    return deg * pi / 180;
+    return deg * PI / 180;
 }
 
 inline double random_double() {

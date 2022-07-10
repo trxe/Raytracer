@@ -5,6 +5,10 @@
 
 class Material;
 
+/**
+ * @brief Record containing normal, material, ray's t-value and whether the hit is a front-face.
+ * 
+ */
 struct HitRecord {
     Point3 p;
     vec3 normal;
@@ -19,6 +23,10 @@ struct HitRecord {
     }
 };
 
+/**
+ * @brief Superclass of all ray-hittable objects in scene.
+ * 
+ */
 class Hittable {
 public:
     virtual bool hit(const Ray& r, double tmin, double tmax, HitRecord& h) const = 0;

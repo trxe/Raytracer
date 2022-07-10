@@ -5,6 +5,17 @@
 #include "hittable_list.h"
 #include "vec3.h"
 
+
+/**
+ * @brief HittableList 
+ * 
+ * @param r 
+ * @param tmin 
+ * @param tmax 
+ * @param h 
+ * @return true if the ray has hit_something
+ * @return false otherwise
+ */
 bool HittableList::hit(const Ray& r, double tmin, double tmax, HitRecord& h) const {
     HitRecord temp_rec;
     bool hit_something = false;

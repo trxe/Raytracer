@@ -16,10 +16,18 @@
 #include "hittable.h"
 #include "hittable_list.h"
 
+/**
+ * @brief Computes the ray's color based on Whitted ray tracing with
+ * 
+ * @param r 
+ * @param world 
+ * @param depth 
+ * @return Color of ray's pixel
+ */
 Color ray_color(const Ray& r, const Hittable& world, int depth) {
 	HitRecord rec;
 	if (depth <= 0) return BLACK;
-	if (world.hit(r, 0.001, inf, rec)) {
+	if (world.hit(r, 0.001, INFTY, rec)) {
 		Color attenuation;
 		Ray scattered;
 		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
@@ -32,7 +40,12 @@ Color ray_color(const Ray& r, const Hittable& world, int depth) {
 }
 
 /**
- * argv[1]: Filename of output. Defaults to img/output.png if not present.
+ * @brief Main entry point into Raytracer. 
+ * Defines World objects, Image settings, and renders to png.
+ * 
+ * @param argc number of arguments
+ * @param argv argv[1] is the output image filename, defaults to img/output.png if not present.
+ * @return int 0 if no issues.
  */
 int main(int argc, char **argv) {
 	
@@ -49,7 +62,7 @@ int main(int argc, char **argv) {
 	world.add(make_shared<Sphere>(Point3(1.0, 0, -1), 0.5, mat_right));
 	world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100, mat_ground));
 
-	//Image
+	// Image config
 
 	double aspect_ratio = 16.0 / 9.0;
 	int image_width = 640;
@@ -60,7 +73,7 @@ int main(int argc, char **argv) {
 
 	// Camera
 
-	camera cam;
+	Camera cam;
 
 	// Render
 
