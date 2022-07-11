@@ -144,4 +144,17 @@ inline vec3 random_in_hemisphere(const vec3& normal) {
     return r;
 }
 
+inline vec3 random_in_unit_disk() {
+    while (true) {
+        auto p = vec3(random_double(-1,1), random_double(-1,1), 0);
+        if (p.length_squared() >= 1) continue;
+        return p;
+    }
+}
+
+inline double schlick(const double& cos_theta, const double& n1, const double& n2) {
+    double reflection_cst = ((n1 - n2)/(n1 + n2)) * ((n1 - n2)/(n1 + n2));
+    return reflection_cst + (1 - reflection_cst) * pow((1 - cos_theta), 5);
+}
+
 #endif

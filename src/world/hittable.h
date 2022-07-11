@@ -1,12 +1,13 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
-#include "vec3.h"
-#include "ray.h"
+#include "../utils/vec3.h"
+#include "../camera/ray.h"
 
 class Material;
 
 /**
- * @brief Record containing normal, material, ray's t-value and whether the hit is a front-face.
+ * @brief Record containing point p, normal, material, ray's t-value and 
+ * whether the hit is a front-face.
  * 
  */
 struct HitRecord {

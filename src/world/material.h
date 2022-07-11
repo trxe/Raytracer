@@ -1,10 +1,10 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "ray.h"
-#include "vec3.h"
+#include "../camera/ray.h"
+#include "../utils/vec3.h"
+#include "../utils/rtweekend.h"
 #include "hittable.h"
-#include "rtweekend.h"
 
 class Material {
 public:
@@ -58,14 +58,24 @@ public:
         double refraction_ratio = rec.front_face ? (1.0/ir) : ir;
 
         vec3 unit_direction = unit_vector(r_in.direction());
-        vec3 refracted = refract(unit_direction, rec.normal, refraction_ratio);
+        double cos_theta = fmin(dot(-unit_direction, rec.normal), 1.0);
+        double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+        bool not_refracting = refraction_ratio * sin_theta > 1.0;
 
-        scattered = Ray(rec.p, refracted);
+        vec3 direction;
+        if (not_refracting || schlick(cos_theta, 1.0, ir) > random_double()) {
+            direction = reflect(unit_direction, rec.normal);
+        } else {
+            direction = refract(unit_direction, rec.normal, refraction_ratio);
+        }
+
+        scattered = Ray(rec.p, direction);
         return true;
     }
 
 public:
     double ir; // Index of Refraction
+
 };
 
 #endif

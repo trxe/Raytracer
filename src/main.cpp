@@ -6,22 +6,23 @@
 #include <iostream>
 #include <memory>
 #include <limits>
-#include "vec3.h"
-#include "color.h"
-#include "camera.h"
-#include "ray.h"
-#include "sphere.h"
-#include "material.h"
-#include "rtweekend.h"
-#include "hittable.h"
-#include "hittable_list.h"
+
+#include "utils/vec3.h"
+#include "utils/color.h"
+#include "camera/camera.h"
+#include "camera/ray.h"
+#include "geometry/sphere.h"
+#include "world/material.h"
+#include "utils/rtweekend.h"
+#include "world/hittable.h"
+#include "world/hittable_list.h"
 
 /**
  * @brief Computes the ray's color based on Whitted ray tracing with
  * 
- * @param r 
- * @param world 
- * @param depth 
+ * @param r Ray
+ * @param world Hittable
+ * @param depth Number of layers of recursion allowed left.
  * @return Color of ray's pixel
  */
 Color ray_color(const Ray& r, const Hittable& world, int depth) {
@@ -34,6 +35,7 @@ Color ray_color(const Ray& r, const Hittable& world, int depth) {
 			return attenuation * ray_color(scattered, world, depth-1);
 		return BLACK;
 	}
+	// If no objects were intersected,get color from the sky.
 	vec3 unit_direction = unit_vector(r.direction());
 	auto t = 0.5 * (unit_direction.y() + 1.0);
 	return (1.0-t)*WHITE + t*BLUE;
@@ -50,17 +52,7 @@ Color ray_color(const Ray& r, const Hittable& world, int depth) {
 int main(int argc, char **argv) {
 	
 	// World
-
-	shared_ptr<Material> mat_ground = make_shared<Lambertian>(0.6 * YELLOW);
-	shared_ptr<Material> mat_center = make_shared<Lambertian>(0.6 * RED);
-	shared_ptr<Material> mat_left = make_shared<Metal>(0.8 * WHITE);
-	shared_ptr<Material> mat_right = make_shared<Metal>(Color(0.8, 0.6, 0.2));
-
-	HittableList world;
-	world.add(make_shared<Sphere>(Point3(0, 0, -1), 0.5, mat_center));
-	world.add(make_shared<Sphere>(Point3(-1.0, 0, -1), 0.5, mat_left));
-	world.add(make_shared<Sphere>(Point3(1.0, 0, -1), 0.5, mat_right));
-	world.add(make_shared<Sphere>(Point3(0, -100.5, -1), 100, mat_ground));
+	HittableList world = threeBallsWorld();
 
 	// Image config
 
@@ -69,11 +61,15 @@ int main(int argc, char **argv) {
 	int image_height = static_cast<int>(image_width / aspect_ratio);
 	int channels = 4;
 	const int samples_per_pixel = 100;
-	const int max_depth = 50;
+	const int max_depth = 20;
 
 	// Camera
 
-	Camera cam;
+	// Camera cam(PI/3, 1.0, aspect_ratio);
+	Camera cam(vec3(-2,2,1), 
+				vec3(0,0,-1),
+				vec3(0,1,0), 
+				PI/4, aspect_ratio, 1.0);
 
 	// Render
 
@@ -84,6 +80,7 @@ int main(int argc, char **argv) {
 		for (int col = 0; col < image_width; col++) {
 			Color pixel_color(0.0, 0.0, 0.0);
 			for (int s = 0; s < samples_per_pixel; s++) {
+				// Random offset for anti-aliasing
 				double u = (double(col) + random_double()) / (image_width - 1);
 				double v = (double(row) + random_double()) / (image_height - 1);
 				Ray r = cam.get_ray(u, v);

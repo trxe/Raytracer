@@ -3,7 +3,7 @@
 
 #include "hittable.h"
 #include "hittable_list.h"
-#include "vec3.h"
+#include "../utils/vec3.h"
 
 
 /**
