@@ -30,6 +30,16 @@ struct HitRecord {
  */
 class Hittable {
 public:
+    /**
+     * @brief Returns if the ray has hit the Hittable object within valid range of t.
+     * 
+     * @param r Incident ray
+     * @param tmin Minimum epsilon tmin
+     * @param tmax Maximum t_max 
+     * @param h HitRecord to fill in
+     * @return true If the ray has hit the object
+     * @return false otherwise
+     */
     virtual bool hit(const Ray& r, double tmin, double tmax, HitRecord& h) const = 0;
 };
 

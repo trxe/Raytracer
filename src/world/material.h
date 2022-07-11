@@ -6,8 +6,22 @@
 #include "../utils/rtweekend.h"
 #include "hittable.h"
 
+/**
+ * @brief Superclass of all materials.
+ * 
+ */
 class Material {
 public:
+    /**
+     * @brief Defines the direction of scattered light ray when hit.
+     * 
+     * @param r_in Incident ray
+     * @param rec HitRecord containing hit normal info etc.
+     * @param attenuation output, color
+     * @param scattered output, outgoing ray
+     * @return true if scattered ray is valid
+     * @return false otherwise
+     */
     virtual bool scatter(const Ray& r_in, const HitRecord& rec, Color& attenuation, Ray& scattered) const = 0;
 };
 

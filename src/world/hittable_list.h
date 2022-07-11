@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "../geometry/sphere.h"
+#include "geometry/sphere.h"
 #include "hittable.h"
 #include "material.h"
 #include "../utils/color.h"
@@ -25,6 +25,7 @@ public:
     void add(shared_ptr<Hittable> object) { objects.push_back(object); }
     void clear() { objects.clear(); }
     virtual bool hit(const Ray& r, double tmin, double tmax, HitRecord& h) const override;
+    bool shadowed(const Ray& shadow, double tmin, double tmax, shared_ptr<Hittable> const &hittable) const;
 
 public:
     vector<shared_ptr<Hittable>> objects;
@@ -51,7 +52,8 @@ inline HittableList threeBallsWorld() {
 }
 
 inline HittableList observeShadowWorld() {
-
+	HittableList world;
+    return world;
 }
 
 #endif

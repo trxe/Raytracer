@@ -11,7 +11,7 @@
 #include "utils/color.h"
 #include "camera/camera.h"
 #include "camera/ray.h"
-#include "geometry/sphere.h"
+#include "world/geometry/sphere.h"
 #include "world/material.h"
 #include "utils/rtweekend.h"
 #include "world/hittable.h"
@@ -65,11 +65,13 @@ int main(int argc, char **argv) {
 
 	// Camera
 
-	// Camera cam(PI/3, 1.0, aspect_ratio);
-	Camera cam(vec3(-2,2,1), 
-				vec3(0,0,-1),
-				vec3(0,1,0), 
-				PI/4, aspect_ratio, 1.0);
+	vec3 eye = vec3(-2,2,1);
+	vec3 at = vec3(0,0,-1);
+	vec3 up = vec3(0,1,0);
+	double vfov = PI/4;
+	double aperture = 1.0;
+
+	Camera cam(eye, at, up, vfov, aspect_ratio, aperture);
 
 	// Render
 
