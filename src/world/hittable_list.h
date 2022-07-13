@@ -1,6 +1,8 @@
 #ifndef HITTABLE_LIST_H
 #define HITTABLE_LIST_H
+#include <functional>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "geometry/sphere.h"
@@ -16,15 +18,11 @@ using std::vector;
  * @brief List of hittables to go through to find the front-most.
  * 
  */
-class HittableList : public Hittable {
+class HittableList {
 public:
-    HittableList() {}
-    HittableList(shared_ptr<Hittable> object) {
-    }
-
     void add(shared_ptr<Hittable> object) { objects.push_back(object); }
     void clear() { objects.clear(); }
-    virtual bool hit(const Ray& r, double tmin, double tmax, HitRecord& h) const override;
+    bool hit(const Ray& r, double tmin, double tmax, HitRecord& rec, shared_ptr<Hittable> hitobj) const;
     bool shadowed(const Ray& shadow, double tmin, double tmax, shared_ptr<Hittable> const &hittable) const;
 
 public:
@@ -39,7 +37,7 @@ public:
 inline HittableList threeBallsWorld() {
 	shared_ptr<Material> mat_ground = make_shared<Lambertian>(0.5 * RED);
 	shared_ptr<Material> mat_center = make_shared<Lambertian>(0.6 * BLUE + 0.1 * RED);
-	shared_ptr<Material> mat_left = make_shared<Metal>(0.8 * YELLOW);
+	shared_ptr<Material> mat_left = make_shared<Metal>(0.2 * YELLOW, YELLOW, WHITE, 16);
 	shared_ptr<Material> mat_right = make_shared<Dielectric>(1.5);
 
 	HittableList world;

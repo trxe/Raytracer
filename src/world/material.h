@@ -22,7 +22,8 @@ public:
      * @return true if scattered ray is valid
      * @return false otherwise
      */
-    virtual bool scatter(const Ray& r_in, const HitRecord& rec, Color& attenuation, Ray& scattered) const = 0;
+    virtual bool scatter(const Ray& r_in, const HitRecord& rec, const Color& light_color,
+        const vec3& light_pos, Color& attenuation, Ray& scattered) const = 0;
 };
 
 class Lambertian : public Material {
@@ -30,7 +31,7 @@ public:
     Lambertian(const Color& a) : albedo(a) {}
 
     virtual bool scatter(
-        const Ray& r_in, const HitRecord& rec, Color& attenuation, Ray& scattered
+        const Ray& r_in, const HitRecord& rec, const Color& light_color, const vec3& light_pos, Color& attenuation, Ray& scattered
     ) const override {
         auto scatter_direction = rec.normal + random_unit_vector();
         if (scatter_direction.near_zero()) 
@@ -46,19 +47,28 @@ public:
 
 class Metal : public Material {
 public:
-    Metal(const Color& a) : albedo(a) {}
+    Metal(const Color& k_a, const Color& k_d, const Color& k_s, int n) : ambient(k_a), diffuse(k_d), specular(k_s), specular_exp(n) {}
 
     virtual bool scatter(
-        const Ray& r_in, const HitRecord& rec, Color& attenuation, Ray& scattered
+        const Ray& r_in, const HitRecord& rec, const Color& light_color, const vec3& light_pos, Color& attenuation, Ray& scattered
     ) const override {
-        auto reflection = rec.normal + reflect(unit_vector(r_in.direction()), rec.normal);
-        scattered = Ray(rec.p, reflection);
-        attenuation = albedo;
-        return dot(reflection, rec.normal) > 0;
+        auto N = unit_vector(rec.normal);
+        auto L = unit_vector(light_pos - rec.p);
+        auto NdotL = std::max(0.0, dot(N, L));
+
+        auto R = reflect(-L, N);
+        auto V = unit_vector(r_in.direction());
+        auto RdotV = std::max(0.0, dot(R, V));
+        scattered = Ray(rec.p, R);
+        attenuation += ambient + light_color * (diffuse * NdotL + specular * pow(RdotV, specular_exp));
+        return NdotL > 0;
     }
 
 public:
-    Color albedo;
+    Color ambient;
+    Color diffuse;
+    Color specular;
+    int specular_exp;
 };
 
 class Dielectric : public Material {
@@ -66,7 +76,7 @@ public:
     Dielectric(const double& refraction_index) : ir(refraction_index) {}
 
     virtual bool scatter(
-        const Ray& r_in, const HitRecord& rec, Color& attenuation, Ray& scattered
+        const Ray& r_in, const HitRecord& rec, const Color& light_color, const vec3& light_pos, Color& attenuation, Ray& scattered
     ) const override {
         attenuation = Color(1.0, 1.0, 1.0);
         double refraction_ratio = rec.front_face ? (1.0/ir) : ir;

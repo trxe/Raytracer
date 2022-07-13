@@ -1,4 +1,7 @@
+#include <cstddef>
+#include <functional>
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "hittable.h"
@@ -16,21 +19,23 @@
  * @return true if the ray has hit something
  * @return false otherwise
  */
-bool HittableList::hit(const Ray& r, double tmin, double tmax, HitRecord& h) const {
+bool HittableList::hit(const Ray& r, double tmin, double tmax, HitRecord& rec, shared_ptr<Hittable> hitobj) const {
+    if (objects.size() == 0) return false;
     HitRecord temp_rec;
-    bool hit_something = false;
     double tclosest = tmax;
+    bool isHit = false;
 
     for (const auto& object : objects) {
         // the hit method from the pointer to the object
         if (object->hit(r, tmin, tclosest, temp_rec)) {
-            hit_something = true;
-            h = temp_rec;
+            rec = temp_rec;
+            hitobj = object;
             tclosest = temp_rec.t;
+            isHit = true;
         }
     }
 
-    return hit_something;
+    return isHit;
 }
 
 bool HittableList::shadowed(const Ray &shadow, double tmin, double tmax,

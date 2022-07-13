@@ -1,3 +1,4 @@
+#include "world/light_list.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -13,22 +14,25 @@
 #include "camera/ray.h"
 #include "world/geometry/sphere.h"
 #include "world/material.h"
+#include "world/light.h"
+#include "world/light_list.h"
 #include "utils/rtweekend.h"
 #include "world/hittable.h"
 #include "world/hittable_list.h"
 
 /**
- * @brief Computes the ray's color based on Whitted ray tracing with
+ * @brief Computes the ray's color without defined lighting.
  * 
  * @param r Ray
  * @param world Hittable
  * @param depth Number of layers of recursion allowed left.
  * @return Color of ray's pixel
- */
-Color ray_color(const Ray& r, const Hittable& world, int depth) {
+Color ray_color(const Ray& r, const HittableList& world, int depth) {
 	HitRecord rec;
+	shared_ptr<Hittable> hitobj;
 	if (depth <= 0) return BLACK;
-	if (world.hit(r, 0.001, INFTY, rec)) {
+	bool is_hit = world.hit(r, 0.001, INFTY, rec, hitobj);
+	if (is_hit) {
 		Color attenuation;
 		Ray scattered;
 		if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
@@ -36,6 +40,30 @@ Color ray_color(const Ray& r, const Hittable& world, int depth) {
 		return BLACK;
 	}
 	// If no objects were intersected,get color from the sky.
+	vec3 unit_direction = unit_vector(r.direction());
+	auto t = 0.5 * (unit_direction.y() + 1.0);
+	return (1.0-t)*WHITE + t*BLUE;
+}
+ */
+
+Color ray_color_lit_scene(const Ray& r, const HittableList& world, const LightList& lightlist, int depth) {
+	if (depth <= 0) return BLACK;
+	vector<shared_ptr<Light>> lights = lightlist.lights;
+	HitRecord rec;
+	shared_ptr<Hittable> hitobj;
+	bool is_hit = world.hit(r, 0.001, INFTY, rec, hitobj);
+	if (is_hit) {
+		Color attenuation = BLACK;
+		Ray scattered;
+		bool isok = false;
+		for (auto light : lights) {
+			Color I_s = light->lit(world, hitobj, rec, 0.001, INFTY);
+			isok = rec.mat_ptr->scatter(r, rec, I_s, light->pos, attenuation, scattered);
+		}
+		if (!isok) return BLACK;
+		return attenuation * ray_color_lit_scene(scattered, world, lightlist, depth-1);
+	}
+	// If no objects were intersected, get color from the sky.
 	vec3 unit_direction = unit_vector(r.direction());
 	auto t = 0.5 * (unit_direction.y() + 1.0);
 	return (1.0-t)*WHITE + t*BLUE;
@@ -53,6 +81,8 @@ int main(int argc, char **argv) {
 	
 	// World
 	HittableList world = threeBallsWorld();
+	LightList lightlist;
+	lightlist.add(make_shared<PointLight>(vec3(1.0, 1.0, 10.0), WHITE));
 
 	// Image config
 
@@ -86,7 +116,7 @@ int main(int argc, char **argv) {
 				double u = (double(col) + random_double()) / (image_width - 1);
 				double v = (double(row) + random_double()) / (image_height - 1);
 				Ray r = cam.get_ray(u, v);
-				pixel_color += ray_color(r, world, max_depth);
+				pixel_color += ray_color_lit_scene(r, world, lightlist, max_depth);
 			}
 			int *cols = getIntColor(pixel_color, samples_per_pixel);
 			for (int c = 0; c < channels; c++) {

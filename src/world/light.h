@@ -10,7 +10,7 @@
  * 
  */
 class Light {
-
+public:
     /**
      * @brief Returns the luminance of this light source.
      * 
@@ -23,23 +23,25 @@ class Light {
      */
     virtual Color lit(const HittableList& world, shared_ptr<Hittable> const &object,
         const HitRecord& rec, double tmin, double tmax) const = 0;
+
+    vec3 pos;
 };
 
 class PointLight: public Light {
 public:
-    PointLight(vec3& p, const Color& c) : pos(p), color(c) {}
+    PointLight(const vec3& p, const Color& c) : pos(p), color(c) {}
     
-    virtual Color lit(const HittableList &world, const shared_ptr<Hittable> &object, 
+    virtual Color lit(const HittableList &world, const shared_ptr<Hittable> &object,
         const HitRecord &rec, double tmin, double tmax
     ) const override {
         Ray shadow(pos, pos - rec.p);
         bool shadowed = world.shadowed(shadow, tmin, tmax, object);
         if (shadowed) return BLACK;
-        else return color;
+        return color;
     }
+    vec3 pos;
 
 private:
-    vec3 pos;
     Color color;
 };
 
